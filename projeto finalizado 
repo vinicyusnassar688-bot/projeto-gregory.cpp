@@ -1,0 +1,312 @@
+
+#include <iostream>
+#include <string>
+
+#define MAX 10
+
+using namespace std;
+
+struct Usuario {
+    int MatriculadoUsuario;
+    string nome;
+    string tipo;
+};
+
+struct Livro {
+    int CodigoLivro;
+    string Titulodolivro;
+    string Autor;
+    string Edicao;
+    int MatriculadoUsuario;
+};
+
+void mostrarMenu() {
+    cout << "----------------------- MENU -----------------------\n";
+    cout << "1 - para Cadastrar Usuario.\n";
+    cout << "2 - para Cadastrar Livro.\n";
+    cout << "3 - para Mostrar Usuarios cadastrados.\n";
+    cout << "4 - para Mostrar Livros cadastrados.\n";
+    cout << "5 - para Buscar livros por usuarios.\n";
+    cout << "6 - para Relatorio Geral.\n";
+    cout << "0 - para sair.\n";
+    cout << "----------------------------------------------------\n\n";
+    cout << "Digite sua opcao: ";
+}
+
+// Cadastrar usuario
+void cadastrarUsuario(Usuario vet[], int &n) {
+
+    if (n == MAX) {
+        cout << "Limite de usuarios atingido!\n";
+        return;
+    }
+
+    int matricula;
+
+    cout << "\n--- Cadastro Usuario ---\n";
+    cout << "Digite a matricula: ";
+    cin >> matricula;
+
+    for (int i = 0; i < n; i++) {
+        if (vet[i].MatriculadoUsuario == matricula) {
+            cout << "Matricula ja cadastrada!\n";
+            return;
+        }
+    }
+
+    vet[n].MatriculadoUsuario = matricula;
+
+    cout << "Digite o nome: ";
+    getline(cin >> ws, vet[n].nome);
+
+    cout << "Digite o tipo: ";
+    cin >> vet[n].tipo;
+
+    n++;
+
+    cout << "Usuario cadastrado com sucesso!\n";
+}
+
+// Cadastrar livro
+void cadastrarLivro(Livro vet[], int &n, Usuario usuarios[], int qtdUsuarios) {
+
+    if (n == MAX) {
+        cout << "Limite de livros atingido!\n";
+        return;
+    }
+
+    cout << "\n--- Cadastro Livro ---\n";
+
+    cout << "Digite o codigo do livro: ";
+    cin >> vet[n].CodigoLivro;
+
+    for (int i = 0; i < n; i++) {
+        if (vet[i].CodigoLivro == vet[n].CodigoLivro) {
+            cout << "Codigo ja cadastrado!\n";
+            return;
+        }
+    }
+
+    cout << "Digite o titulo do livro: ";
+    getline(cin >> ws, vet[n].Titulodolivro);
+
+    cout << "Digite o autor do livro: ";
+    getline(cin, vet[n].Autor);
+
+    cout << "Digite a edicao do livro: ";
+    getline(cin, vet[n].Edicao);
+
+    int matricula;
+    int encontrado = 0;
+
+    cout << "\nDigite a matricula do usuario.\n";
+    cout << "Digite 0 se o livro nao estiver emprestado: ";
+    cin >> matricula;
+
+    if (matricula == 0) {
+        vet[n].MatriculadoUsuario = -1;
+    }
+    else {
+
+        for (int i = 0; i < qtdUsuarios; i++) {
+
+            if (usuarios[i].MatriculadoUsuario == matricula) {
+                encontrado = 1;
+            }
+        }
+
+        if (encontrado == 1) {
+            vet[n].MatriculadoUsuario = matricula;
+            cout << "Livro associado ao usuario!\n";
+        }
+        else {
+            cout << "Usuario nao encontrado! Livro ficara sem emprestimo.\n";
+            vet[n].MatriculadoUsuario = -1;
+        }
+    }
+
+    n++;
+
+    cout << "Livro cadastrado com sucesso!\n";
+}
+
+// Listar usuarios
+void ListarUsuarios(Usuario vet[], int n) {
+
+    cout << "\n=== Listar usuarios ===\n";
+
+    if (n == 0) {
+        cout << "Nenhum usuario cadastrado.\n";
+    }
+
+    for (int i = 0; i < n; i++) {
+
+        cout << "---------------------------------\n";
+        cout << "Matricula: " << vet[i].MatriculadoUsuario << endl;
+        cout << "Nome: " << vet[i].nome << endl;
+        cout << "Tipo: " << vet[i].tipo << endl;
+    }
+
+    cout << "---------------------------------\n";
+}
+
+// Listar livros
+void ListarLivros(Livro vet[], int n, Usuario usuarios[], int qtdUsuarios) {
+
+    cout << "\n=== Listar livros ===\n";
+
+    if (n == 0) {
+        cout << "Nenhum livro cadastrado.\n";
+    }
+
+    for (int i = 0; i < n; i++) {
+
+        cout << "---------------------------------\n";
+        cout << "Codigo: " << vet[i].CodigoLivro << endl;
+        cout << "Livro: " << vet[i].Titulodolivro << endl;
+        cout << "Autor: " << vet[i].Autor << endl;
+        cout << "Edicao: " << vet[i].Edicao << endl;
+
+        if (vet[i].MatriculadoUsuario == -1) {
+            cout << "Emprestado para: Ninguem\n";
+        }
+        else {
+
+            for (int j = 0; j < qtdUsuarios; j++) {
+
+                if (usuarios[j].MatriculadoUsuario == vet[i].MatriculadoUsuario) {
+                    cout << "Emprestado para: " << usuarios[j].nome << endl;
+                }
+            }
+        }
+    }
+
+    cout << "---------------------------------\n";
+}
+
+// Buscar livros por usuario
+void BuscarLivros(Livro livros[], int qtdLivros, Usuario usuarios[], int qtdUsuarios) {
+
+    int matricula;
+    int encontrado = 0;
+    int encontrouLivro = 0;
+
+    cout << "\nDigite a matricula do usuario: ";
+    cin >> matricula;
+
+    for (int i = 0; i < qtdUsuarios; i++) {
+
+        if (usuarios[i].MatriculadoUsuario == matricula) {
+            encontrado = 1;
+        }
+    }
+
+    if (encontrado == 0) {
+        cout << "Usuario nao encontrado!\n";
+        return;
+    }
+
+    cout << "\nLivros emprestados para a matricula " << matricula << ":\n";
+
+    for (int i = 0; i < qtdLivros; i++) {
+
+        if (livros[i].MatriculadoUsuario == matricula) {
+
+            cout << "---------------------------------\n";
+            cout << "Codigo: " << livros[i].CodigoLivro << endl;
+            cout << "Livro: " << livros[i].Titulodolivro << endl;
+            cout << "Autor: " << livros[i].Autor << endl;
+            cout << "Edicao: " << livros[i].Edicao << endl;
+
+            encontrouLivro = 1;
+        }
+    }
+
+    if (encontrouLivro == 0) {
+        cout << "Esse usuario nao possui livros emprestados.\n";
+    }
+}
+
+// Relatorio geral
+void RelatorioGeral(Usuario usuarios[], int qtdUsuarios, Livro livros[], int qtdLivros) {
+
+    cout << "\n======= RELATORIO GERAL =======\n";
+
+    if (qtdUsuarios == 0) {
+        cout << "Nenhum usuario cadastrado.\n";
+        return;
+    }
+
+    for (int i = 0; i < qtdUsuarios; i++) {
+
+        int quantidade = 0;
+
+        for (int j = 0; j < qtdLivros; j++) {
+
+            if (usuarios[i].MatriculadoUsuario == livros[j].MatriculadoUsuario) {
+                quantidade++;
+            }
+        }
+
+        cout << "---------------------------------\n";
+        cout << "Usuario: " << usuarios[i].nome << endl;
+        cout << "Matricula: " << usuarios[i].MatriculadoUsuario << endl;
+        cout << "Livros emprestados: " << quantidade << endl;
+    }
+
+    cout << "---------------------------------\n";
+}
+
+// Programa principal
+int main() {
+
+    Usuario usuarios[MAX];
+    Livro livros[MAX];
+
+    int qtdUsuarios = 0;
+    int qtdLivros = 0;
+    int opcao;
+
+    do {
+
+        mostrarMenu();
+        cin >> opcao;
+
+        switch (opcao) {
+
+            case 1:
+                cadastrarUsuario(usuarios, qtdUsuarios);
+                break;
+
+            case 2:
+                cadastrarLivro(livros, qtdLivros, usuarios, qtdUsuarios);
+                break;
+
+            case 3:
+                ListarUsuarios(usuarios, qtdUsuarios);
+                break;
+
+            case 4:
+                ListarLivros(livros, qtdLivros, usuarios, qtdUsuarios);
+                break;
+
+            case 5:
+                BuscarLivros(livros, qtdLivros, usuarios, qtdUsuarios);
+                break;
+
+            case 6:
+                RelatorioGeral(usuarios, qtdUsuarios, livros, qtdLivros);
+                break;
+
+            case 0:
+                cout << "\nEncerrando o programa...\n";
+                break;
+
+            default:
+                cout << "\nOpcao invalida!\n";
+        }
+
+    } while (opcao != 0);
+
+    return 0;
+}
